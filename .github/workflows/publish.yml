@@ -17,8 +17,5 @@ jobs:
         password: ${{ secrets.CR_PAT }}
 
     - name: Build the Lorita Bot Docker image
-      run: |
-        docker build . --tag ghcr.io/jonashackt/hello-world:latest
-        docker run ghcr.io/jonashackt/hello-world:latest
-        docker push ghcr.io/jonashackt/hello-world:latest
+      run: make build-and-publish-github-registry
 
