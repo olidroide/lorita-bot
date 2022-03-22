@@ -28,6 +28,8 @@ RUN pip install -r requirements.txt
 # final stage
 FROM python:3.9-slim
 
+LABEL org.opencontainers.image.source="https://github.com/olidroide/lorita-bot/"
+
 RUN addgroup --system app && adduser --system --group app
 USER app
 
