@@ -145,23 +145,23 @@ Depends of how do you want deploy it:
  	
 	- Install dependencies
 		```sh
-   	pip install -r requirements.txt
-   	```
+   		pip install -r requirements.txt
+   		```
 	
 	- Launch server
-   	```sh
-   	python src/main.py 
-   	```
+   		```sh
+   		python src/main.py 
+   		```
 	 
 - Deploy with Docker 📦
 	- Build docker image with docker-compose
-   ```sh
-   docker-compose up -d --build 
-   ```
+	  	```sh
+		docker-compose up -d --build 
+	   	```
 	 - Or use pre build image from 
-	 ```
-	 docker pull ghcr.io/olidroide/lorita-bot:main
-	 ```
+		 ```sh
+		 docker pull ghcr.io/olidroide/lorita-bot:main
+		 ```
 	 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
