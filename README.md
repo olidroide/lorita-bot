@@ -54,8 +54,8 @@
 
 
 <!-- TABLE OF CONTENTS -->
+## 📝 Table of Contents
 <details>
-  <summary>Table of Contents</summary>
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
@@ -82,7 +82,8 @@
 
 
 <!-- ABOUT THE PROJECT -->
-## About The Project
+
+## 💡 About The Project
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
@@ -94,7 +95,7 @@ Lorita-Bot transcribe that Audio Message to text, and you cand read it without l
 
 
 
-### Built With
+## ⛏️ Built With
 
 * [FastAPI](https://fastapi.tiangolo.com/)
 * [Python](https://www.python.org/)
@@ -106,7 +107,7 @@ Lorita-Bot transcribe that Audio Message to text, and you cand read it without l
 
 
 <!-- GETTING STARTED -->
-## Getting Started
+## 🏁 Getting Started
 
 This is an example of how you may give instructions on setting up your project locally or in a Server.
 
@@ -118,7 +119,7 @@ Depends of how do you want deploy it:
 - Docker:
 	- Install `Docker` on your OS (also I recommend install `docker-compose`)
 
-### Installation
+### ⚡ Installation
 
 - Get a free API Key at [deepgram.com](https://deepgram.com)
 - Get a free API Key at [twilio.com](https://twilio.com)
@@ -195,7 +196,7 @@ See the [open issues](https://github.com/olidroide/lorita-bot/issues) for a full
 
 
 <!-- CONTRIBUTING -->
-## Contributing
+## 🤝 Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
@@ -213,16 +214,18 @@ Don't forget to give the project a star! Thanks again!
 
 
 <!-- LICENSE -->
-## License
+## ✍️ License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the GNU General Public License v2.0. See `LICENSE` for more information.
+
+Lorita-bot logo parrot designs were created by Freepik - Flaticon [Freepik - Flaticon](https://www.flaticon.com/free-icons/parrot) 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
 
 <!-- CONTACT -->
-## Contact
+## 📫 Contact
 
 olidroide - [@olidroide](https://twitter.com/olidroide) - lorita@olidroide.es
 
@@ -241,6 +244,30 @@ Project Link: [https://github.com/olidroide/lorita-bot](https://github.com/olidr
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+<!-- 
+## 🍰 **Supporters and donators**
+
+<a href="https://github.com/olidroide/lorita-bot/generate">
+  <img alt="@olidroide/lorita-bot's brand logo without text" align="right" src="https://i.imgur.com/3qK1sie.png" width="18%" />
+</a>
+
+We are currently looking for new donators to help and maintain this project! ❤️
+
+By donating, you will help the development of this project, and *you will be featured in this project's README.md*, so everyone can see your kindness and visit your content ⭐.
+
+<a href="https://github.com/sponsors/olidroide">
+  <img src="https://img.shields.io/badge/Sponsor-olidroide/project template-blue?logo=github-sponsors&style=for-the-badge&color=red">
+</a>
+-->
+
+<!--
+## 🎉 Help us raise these numbers up
+
+[![GitHub's followers](https://img.shields.io/github/followers/olidroide.svg?style=social)](https://github.com/olidroide)
+[![GitHub stars](https://img.shields.io/github/stars/olidroide/lorita-bot.svg?style=social)](https://github.com/olidroide/lorita-bot/stargazers)
+[![GitHub watchers](https://img.shields.io/github/watchers/olidroide/lorita-bot.svg?style=social)](https://github.com/olidroide/lorita-bot/watchers)
+[![GitHub forks](https://img.shields.io/github/forks/olidroide/lorita-bot.svg?style=social)](https://github.com/olidroide/lorita-bot/network/members)
+-->
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
