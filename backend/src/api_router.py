@@ -1,15 +1,15 @@
 from typing import Optional, List, Dict
 
-import uvicorn
 from deepgram import Deepgram
+from fastapi import APIRouter
 from fastapi import Depends, Request
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 from twilio.rest import Client  # type: ignore
 
-from app import create_app, get_settings, Settings
+from app import get_settings, Settings
 
-app = create_app()
+router = APIRouter()
 
 
 class TranscribeRequest(BaseModel):
@@ -48,7 +48,7 @@ async def audio_to_text(media_url: str) -> str:
     # submit the recording to deepgram
     client = Deepgram(get_settings().dg_key)
     source = {"url": media_url}
-    options = {"punctuate": True, "language": "es"}
+    options = {"punctuate": True, "interim_results": True, "language": "es"}
 
     deepgram_res = await client.transcription.prerecorded(source, options)
 
@@ -59,7 +59,7 @@ async def audio_to_text(media_url: str) -> str:
     return deepgram_res.get_result_unified
 
 
-@app.post(path="/transcribe")
+@router.post("/transcribe")
 async def transcribe(data: TranscribeRequest, settings: Settings = Depends(get_settings)):
     print(f"got request in transcribe:{data.audio_url}")
     print(f"Settings: {settings}")
@@ -85,7 +85,7 @@ class WhatsappReceiver(BaseModel):
     ApiVersion: Optional[str]
 
 
-@app.post(path="/whatsapp/receive", response_class=PlainTextResponse)
+@router.post("/whatsapp/receive", response_class=PlainTextResponse)
 async def whatsapp_receiver(request: Request, settings: Settings = Depends(get_settings)):
     incoming_msg = await request.form()
     final_dict = dict()
@@ -111,7 +111,3 @@ async def whatsapp_receiver(request: Request, settings: Settings = Depends(get_s
         response = receiver.Body
 
     return response
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)

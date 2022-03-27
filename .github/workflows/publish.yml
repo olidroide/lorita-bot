@@ -14,6 +14,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Docker meta
+        id: meta # you'll use this in the next step
+        uses: docker/metadata-action@v3
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ghcr.io/olidroide/lorita-bot-backend
+          # Docker tags based on the following events/attributes
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=ref,event=pr
+            type=edge
+          labels: |
+            org.opencontainers.image.title=lorita-bot
+            org.opencontainers.image.description=Speech to text for chats apps
+            org.opencontainers.image.vendor=olidroide
+
+
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -22,6 +42,18 @@ jobs:
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+
+      - name: Build image
+        uses: docker/bake-action@v1
+        with:
+          files: |
+            ./docker-bake.hcl
+            ${{ steps.meta.outputs.bake-file }}
+          targets: lorita-bot-release
+          pull: true
+          push: ${{ github.event_name != 'pull_request' }}
 
       - name: Login to GHCR
         if: github.event_name != 'pull_request'
@@ -31,22 +63,6 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker meta
-        id: meta # you'll use this in the next step
-        uses: docker/metadata-action@v3
-        with:
-          # list of Docker images to use as base name for tags
-          images: |
-            ghcr.io/olidroide/lorita-bot
-          # Docker tags based on the following events/attributes
-          tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha
 
       - name: Build and push
         uses: docker/build-push-action@v2
