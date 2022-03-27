@@ -8,6 +8,7 @@
 Dockerfile
 README.md
 docker-compose.yml
+docker-bake.hcl
 **/.DS_Store
 **/venv
 **/env

@@ -18,10 +18,10 @@ RUN pip install virtualenv
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-WORKDIR /lorita-bot
+WORKDIR /lorita-bot/backend
 
 
-COPY requirements.txt .
+COPY ./backend/requirements.txt .
 RUN pip install -r requirements.txt
 
 
@@ -33,15 +33,13 @@ LABEL org.opencontainers.image.source="https://github.com/olidroide/lorita-bot/"
 RUN addgroup --system app && adduser --system --group app
 USER app
 
-WORKDIR /lorita-bot
+WORKDIR /lorita-bot/backend
 
 COPY --from=builder /opt/venv /opt/venv
-COPY ./src /lorita-bot/src
+COPY ./backend/src /lorita-bot/backend/src
 ENV PATH="/opt/venv/bin:$PATH"
 
 
-EXPOSE 8000
-
 #CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "app:app"]
 #CMD ["uvicorn", "src.app:app", "--workers", "3", "--limit-max-requests", "100000", "--host", "0.0.0.0"]
-CMD ["python3", "/lorita-bot/src/main.py"]
+CMD ["python", "/lorita-bot/backend/src/main.py"]
