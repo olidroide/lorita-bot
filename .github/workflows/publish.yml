@@ -29,7 +29,7 @@ jobs:
             type=ref,event=pr
             type=edge
           labels: |
-            org.opencontainers.image.title=lorita-bot
+            org.opencontainers.image.title=lorita-bot-backend
             org.opencontainers.image.description=Speech to text for chats apps
             org.opencontainers.image.vendor=olidroide
 
@@ -51,7 +51,7 @@ jobs:
           files: |
             ./docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
-          targets: lorita-bot-release
+          targets: lorita-bot-backend-release
           pull: true
           push: ${{ github.event_name != 'pull_request' }}
 
