@@ -70,7 +70,7 @@ async def transcribe(data: TranscribeRequest, settings: Settings = Depends(get_s
     return result
 
 
-class WhatsappReceiver(BaseModel):
+class TwilioWhatsappReceiver(BaseModel):
     SmsMessageSid: Optional[str]
     NumMedia: Optional[int]
     ProfileName: Optional[str]
@@ -85,22 +85,19 @@ class WhatsappReceiver(BaseModel):
     ApiVersion: Optional[str]
 
 
-@router.post("/whatsapp/receive", response_class=PlainTextResponse)
-async def whatsapp_receiver(request: Request, settings: Settings = Depends(get_settings)):
-    incoming_msg = await request.form()
-    final_dict = dict()
-    for key, value in incoming_msg.items():
-        final_dict[key] = value
-
-    receiver = WhatsappReceiver.parse_obj(final_dict)
+async def proces_twilio_request(request_body: dict):
+    receiver = TwilioWhatsappReceiver.parse_obj(request_body)
     print(f"got request : {receiver}")
 
     response = ""
 
+    if not receiver.NumMedia:
+        return response
+
     media_item_counter = 0
     while media_item_counter < receiver.NumMedia:
-        media_url = final_dict[f"MediaUrl{media_item_counter}"]
-        media_content_type = final_dict[f"MediaContentType{media_item_counter}"]
+        media_url = request_body[f"MediaUrl{media_item_counter}"]
+        media_content_type = request_body[f"MediaContentType{media_item_counter}"]
         print(f"url: {media_url} content_type: {media_content_type}")
         media_item_counter = media_item_counter + 1
         if "audio" in media_content_type:
@@ -111,3 +108,85 @@ async def whatsapp_receiver(request: Request, settings: Settings = Depends(get_s
         response = receiver.Body
 
     return response
+
+
+class MessageBirdContact(BaseModel):
+    id: Optional[str]
+    href: Optional[str]
+    msisdn: Optional[int]
+    displayName: Optional[str]
+    firstName: Optional[str]
+    lastName: Optional[str]
+    customDetails: Optional[dict]
+    attributes: Optional[dict]
+    createdDatetime: Optional[str]
+    updatedDatetime: Optional[str]
+
+
+class MessageBirdConversationMessage(BaseModel):
+    totalCount: Optional[int]
+    href: Optional[str]
+
+
+class MessageBirdConversation(BaseModel):
+    id: Optional[str]
+    contactId: Optional[str]
+    status: Optional[str]
+    createdDatetime: Optional[str]
+    updatedDatetime: Optional[str]
+    lastReceivedDatetime: Optional[str]
+    lastUsedChannelId: Optional[str]
+    messages: Optional[MessageBirdConversationMessage]
+
+
+class MessageBirdMessageContentAudio(BaseModel):
+    url: str
+
+
+class MessageBirdMessageContent(BaseModel):
+    audio: Optional[MessageBirdMessageContentAudio]
+    text: Optional[str]
+
+
+class MessageBirdMessage(BaseModel):
+    id: Optional[str]
+    conversationId: Optional[str]
+    platform: Optional[str]
+    to: Optional[str]
+    from_: Optional[str]
+    channelId: Optional[str]
+    type: Optional[str]
+    direction: Optional[str]
+    status: Optional[str]
+    createdDatetime: Optional[str]
+    updatedDatetime: Optional[str]
+    content: Optional[MessageBirdMessageContent]
+
+    class Config:
+        allow_population_by_field_name = True
+        fields = {"from_": "from"}
+
+
+class MessageBirdWhatsappReceiver(BaseModel):
+    contact: Optional[MessageBirdContact]
+    conversation: Optional[MessageBirdConversation]
+    message: Optional[MessageBirdMessage]
+    type: str
+
+
+@router.post("/whatsapp/receive", response_class=PlainTextResponse)
+async def whatsapp_receiver(request: Request, settings: Settings = Depends(get_settings)):
+    incoming_msg = await request.form()
+    final_dict = dict()
+    for key, value in incoming_msg.items():
+        final_dict[key] = value
+
+    print(f"Request from: {request.headers} - {request.client} - {request.client.host}")
+
+    # if "messagebird-signature" in request.headers:
+    #     'user-agent': 'MessageBirdHTTPQueue/xxxxx'
+    #  'user-agent': 'TwilioProxy/1.1',
+    # 'x-twilio-signature'
+    #TODO add request verification from Twilio or MessageBird
+
+    return await proces_twilio_request(request_body=final_dict)
