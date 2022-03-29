@@ -6,7 +6,6 @@ from fastapi.staticfiles import StaticFiles
 
 from api_router import router as api_router
 from app import get_settings
-from robots_router import router as robots_router
 
 
 def create_app():
@@ -32,19 +31,14 @@ def create_app():
     async def shutdown_event():
         pass
 
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    app.mount("/", StaticFiles(directory=os.path.join(dir_path, "static")), name="static")
-
-    # app.include_router(
-    #     robots_router,
-    #     tags=["robots"],
-    # )
-
     app.include_router(
         api_router,
         prefix=app.state.config.baseurl,
         tags=["api"],
     )
+
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    app.mount("/", StaticFiles(directory=os.path.join(dir_path, "static")), name="static")
 
     return app
 
