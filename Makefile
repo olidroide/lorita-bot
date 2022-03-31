@@ -9,3 +9,5 @@ build-backend-release-image:
 build-run-backend-compose:
 	COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f docker-compose.build.yml --env-file backend/.env up --build
 
+unittests:
+	PYTHONPATH=$(pwd)/backend/src LORITA_BOT_BACKEND_TESTING=True python -m pytest backend/tests -vv

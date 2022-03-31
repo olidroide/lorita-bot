@@ -1,16 +1,18 @@
 from functools import lru_cache
+from typing import Optional
 
 from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
+    testing: bool = False
     debug: bool = False
     baseurl: str = "/api/v1"
     port: int = 8000
     log_level: str = "DEBUG"
-    twilio_account_sid: str
-    twilio_auth_token: str
-    dg_key: str
+    twilio_account_sid: Optional[str]
+    twilio_auth_token: Optional[str]
+    dg_key: Optional[str]
 
     class Config:
         env_file = "../.env"

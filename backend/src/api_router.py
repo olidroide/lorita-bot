@@ -5,7 +5,6 @@ from fastapi import APIRouter
 from fastapi import Depends, Request
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
-from twilio.rest import Client  # type: ignore
 
 from app import get_settings, Settings
 
