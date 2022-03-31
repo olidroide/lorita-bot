@@ -1,9 +1,14 @@
-name: publish
+name: Publish Docker Image
 
-on: [ push ]
+on:
+  workflow_run:
+      workflows: ["Tests"]
+      type:
+        - complete
 
 jobs:
   publish-lorita-bot-backend-image:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       # Get the repository's code
