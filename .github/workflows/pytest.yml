@@ -5,7 +5,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      LORITA_BOT_BACKEND_TESTING: true
+      LORITA_BOT_BACKEND_TESTING: True
     strategy:
       matrix:
         python-version: [3.9]
@@ -27,4 +27,4 @@ jobs:
           pip install -e backend
 
       - name: Run Tests
-        run: PYTHONPATH=$(pwd)/backend/src LORITA_BOT_BACKEND_TESTING=True python -m pytest backend/tests -vv
+        run: PYTHONPATH=$(pwd)/backend/src python -m pytest backend/tests -vvv

@@ -29,6 +29,7 @@ RUN pip install -r requirements.txt
 FROM python:3.9-slim
 
 LABEL org.opencontainers.image.source="https://github.com/olidroide/lorita-bot/"
+LABEL org.opencontainers.image.description="IMPROVEMENTS"
 
 RUN addgroup --system app && adduser --system --group app
 USER app

@@ -11,6 +11,7 @@ app = create_app()
 @pytest.fixture(scope="function")
 async def application() -> FastAPI:
     try:
+        app.state.config.testing = True
         yield app
     finally:
         pass

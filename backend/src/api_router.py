@@ -1,81 +1,25 @@
-from typing import Optional, List, Dict
+import asyncio
+from typing import Optional, ClassVar
 
-from deepgram import Deepgram
 from fastapi import APIRouter
 from fastapi import Depends, Request
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
 from app import get_settings, Settings
+from domains.transcription.factory import get_deepgram_client
+from domains.transcription.repository import TranscriptionClient
 
 router = APIRouter()
 
 
-class TranscribeRequest(BaseModel):
-    audio_url: str
-
-
-class DeepgramAlternative(BaseModel):
-    transcript: str
-    confidence: float
-    words: Optional[List[Dict]]
-
-
-class DeepgramChannel(BaseModel):
-    alternatives: List[DeepgramAlternative]
-
-
-class DeepgramResult(BaseModel):
-    channels: List[DeepgramChannel]
-
-
-class DeepgramTranscriptionResult(BaseModel):
-    metadata: dict
-    results: DeepgramResult
-
-    @property
-    def get_result_unified(self) -> str:
-        result_unified = ""
-        for channel in self.results.channels:
-            for alternative in channel.alternatives:
-                result_unified = result_unified + alternative.transcript
-
-        return result_unified
-
-
-async def audio_to_text(media_url: str) -> str:
-    # submit the recording to deepgram
-    client = Deepgram(get_settings().dg_key)
-    source = {"url": media_url}
-    options = {"punctuate": True, "interim_results": True, "language": "es"}
-
-    deepgram_res = await client.transcription.prerecorded(source, options)
-
-    print(f"Transcription complete!\n {deepgram_res}")
-
-    deepgram_res = DeepgramTranscriptionResult.parse_obj(deepgram_res)
-
-    return deepgram_res.get_result_unified
-
-
-@router.post("/transcribe")
-async def transcribe(data: TranscribeRequest, settings: Settings = Depends(get_settings)):
-    print(f"got request in transcribe:{data.audio_url}")
-    print(f"Settings: {settings}")
-    print("sending recording to deepgram")
-
-    result = await audio_to_text(media_url=data.audio_url)
-    print("done processing request, sending deepgram response back to client", result)
-    return result
-
-
 class TwilioWhatsappReceiver(BaseModel):
     SmsMessageSid: Optional[str]
-    NumMedia: Optional[int]
+    NumMedia: Optional[int] = 0
     ProfileName: Optional[str]
     SmsSid: Optional[str]
     WaId: Optional[str]
-    Body: Optional[str]
+    Body: Optional[str] = ""
     To: Optional[str]
     NumSegments: Optional[str]
     MessageSid: Optional[str]
@@ -83,30 +27,53 @@ class TwilioWhatsappReceiver(BaseModel):
     From: Optional[str]
     ApiVersion: Optional[str]
 
+    def _get_dynamic_attr(self, name: str) -> Optional[str]:
+        try:
+            return getattr(self, name)
+        except AttributeError:
+            pass
 
-async def proces_twilio_request(request_body: dict):
+    def get_media_url(self, id: int) -> Optional[str]:
+        return self._get_dynamic_attr(f"MediaUrl{id}")
+
+    def get_media_content_type(self, id: int) -> Optional[str]:
+        return self._get_dynamic_attr(f"MediaContentType{id}")
+
+    class Config:
+        extra = "allow"
+
+
+async def _process_twilio_media(
+    receiver: TwilioWhatsappReceiver, media_id: int, transcription_client: ClassVar[TranscriptionClient]
+):
+    if not (media_url := receiver.get_media_url(media_id)):
+        return
+
+    if not (media_content_type := receiver.get_media_content_type(media_id)):
+        return
+
+    print(f"url: {media_url} content_type: {media_content_type}")
+
+    if "audio" not in media_content_type:
+        return
+
+    return await transcription_client.audio_to_text(media_url=media_url)
+
+
+async def proces_twilio_request(request_body: dict, transcription_client: ClassVar[TranscriptionClient]):
     receiver = TwilioWhatsappReceiver.parse_obj(request_body)
-    print(f"got request : {receiver}")
+    if not (
+        responses := await asyncio.gather(
+            *[
+                _process_twilio_media(receiver, media_item_counter, transcription_client)
+                for media_item_counter in range(receiver.NumMedia)
+            ]
+        )
+    ):
+        responses = [receiver.Body]
 
-    response = ""
-
-    if not receiver.NumMedia:
-        return response
-
-    media_item_counter = 0
-    while media_item_counter < receiver.NumMedia:
-        media_url = request_body[f"MediaUrl{media_item_counter}"]
-        media_content_type = request_body[f"MediaContentType{media_item_counter}"]
-        print(f"url: {media_url} content_type: {media_content_type}")
-        media_item_counter = media_item_counter + 1
-        if "audio" in media_content_type:
-            audio_text = await audio_to_text(media_url=media_url)
-            response = response + audio_text
-
-    if not response:
-        response = receiver.Body
-
-    return response
+    twilio_character_limit = 1600
+    return "".join(responses)[:twilio_character_limit]
 
 
 class MessageBirdContact(BaseModel):
@@ -186,6 +153,10 @@ async def whatsapp_receiver(request: Request, settings: Settings = Depends(get_s
     #     'user-agent': 'MessageBirdHTTPQueue/xxxxx'
     #  'user-agent': 'TwilioProxy/1.1',
     # 'x-twilio-signature'
-    #TODO add request verification from Twilio or MessageBird
+    # TODO add request verification from Twilio or MessageBird
+    async with get_deepgram_client(api_key=settings.dg_key) as transcription_client:
+        transcribed_text = await proces_twilio_request(
+            request_body=final_dict, transcription_client=transcription_client
+        )
 
-    return await proces_twilio_request(request_body=final_dict)
+    return transcribed_text
