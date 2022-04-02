@@ -1,14 +1,9 @@
-name: Publish Backend Docker Image
+name: Publish Frontend Docker Image
 
-on:
-  workflow_run:
-      workflows: ["Tests"]
-      type:
-        - complete
+on: [ push ]
 
 jobs:
-  publish-lorita-bot-backend-image:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  publish-lorita-bot-frontend-image:
     runs-on: ubuntu-latest
     steps:
       # Get the repository's code
@@ -35,9 +30,9 @@ jobs:
             ghcr.io/olidroide/lorita-bot
           # Docker tags based on the following events/attributes
           tags: |
-            type=raw,value=backend-latest
+            type=raw,value=frontend-latest
           labels: |
-            org.opencontainers.image.title=lorita-bot-backend
+            org.opencontainers.image.title=lorita-bot-frontend
             org.opencontainers.image.description=Speech to text for chats apps
             org.opencontainers.image.vendor=olidroide
 
@@ -64,7 +59,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: backend/Dockerfile
+          file: frontend/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}

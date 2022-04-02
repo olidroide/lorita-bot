@@ -9,3 +9,12 @@ services:
       dockerfile: backend/Dockerfile
     env_file:
       - backend/.env
+
+  lorita-bot-frontend:
+    container_name: lorita-bot-frontend
+    image: lorita-bot-frontend:latest
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    env_file:
+      - frontend/.env

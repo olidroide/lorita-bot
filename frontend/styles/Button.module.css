@@ -1,0 +1,21 @@
+.button {
+    background: green;
+    border: 0;
+    color: azure;
+    border-radius: 9999px;
+    font-size: 16px;
+    font-weight: 800;
+    padding: 8px 24px;
+    cursor: pointer;
+    transition: opacity .4s ease;
+    display: flex;
+    align-items: center;
+}
+
+.button:hover {
+    opacity: .7;
+}
+
+.button svg{
+    margin-right: 8px;
+}
