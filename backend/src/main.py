@@ -1,3 +1,4 @@
+import asyncio
 import os
 
 import uvicorn
@@ -30,7 +31,8 @@ def create_app():
 
     @app.on_event("shutdown")
     async def shutdown_event():
-        pass
+        if app.state.telegram_bind:
+            await app.state.telegram_bind.close()
 
     app.include_router(
         api_router,

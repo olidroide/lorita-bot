@@ -13,7 +13,8 @@ class Settings(BaseSettings):
     twilio_account_sid: Optional[str]
     twilio_auth_token: Optional[str]
     dg_key: Optional[str]
-    telegram_api_key: str
+    telegram_api_key: Optional[str]
+    domain_name: Optional[str]
 
     class Config:
         env_file = "../.env"

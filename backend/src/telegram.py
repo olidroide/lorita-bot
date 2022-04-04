@@ -1,36 +1,43 @@
-from telebot.async_telebot import AsyncTeleBot
+# from telebot.async_telebot import AsyncTeleBot
+from aiogram import Bot, Dispatcher, types
 
 from app import Settings
 
 
 async def init_telegram(config: Settings):
-    bot = AsyncTeleBot(config.telegram_api_key)
-    await bot.polling()
+    if not config.domain_name or not config.telegram_api_key or config.testing:
+        return
 
-    # Handle '/start' and '/help'
-    @bot.message_handler(commands=["help", "start"])
-    async def send_welcome(self, message):
-        await self.bot.reply_to(
-            message,
-            """\
-    Hi there, I am EchoBot.
-    I am here to echo your kind words back to you. Just say anything nice and I'll say the exact same thing to you!\
-    """,
-        )
-
-    # Handle all other messages with content_type 'text' (content_types defaults to ['text'])
-    @bot.message_handler(func=lambda message: True)
-    async def echo_message(self, message):
-        await self.bot.reply_to(message, message.text)
-
-    return bot
-
-#
-# class LoritaTelegram:
-#     bot: AsyncTeleBot
-#
-#     def __init__(self, bot: AsyncTeleBot) -> None:
-#         super().__init__()
-#         self.bot = bot
+    bot = Bot(token=config.telegram_api_key)
 
 
+    WEBHOOK_URL = f"https://{config.domain_name}{config.baseurl}/telegram"
+    webhook_info = await bot.get_webhook_info()
+    if webhook_info.url != WEBHOOK_URL:
+        await bot.set_webhook(url=WEBHOOK_URL)
+
+    return LoritaTelegram(bot=bot)
+
+
+class LoritaTelegram:
+    bot: Bot
+    dispatcher: Dispatcher
+
+    def __init__(
+        self,
+        bot: Bot
+    ) -> None:
+        super().__init__()
+        self.bot = bot
+        dispatcher = Dispatcher(bot)
+
+
+        @dispatcher.message_handler(commands="start")
+        async def start(message: types.Message):
+            await message.answer(f"Hi, {message.from_user.full_name}")
+
+        self.dispatcher = dispatcher
+
+    async def close(self):
+        await self.bot.delete_webhook(True)
+        await self.bot.close()
