@@ -2,6 +2,7 @@
 from typing import Optional
 
 from aiogram import Bot, Dispatcher, types
+from aiogram.dispatcher.webhook import SendMessage
 
 from app import Settings
 
@@ -21,8 +22,17 @@ class LoritaTelegram:
 
         self.dispatcher = dispatcher
 
+        # @dispatcher.message_handler()
+        # async def echo(message: types.Message):
+        #     # Regular request
+        #     # await bot.send_message(message.chat.id, message.text)
+        #
+        #     # or reply INTO webhook
+        #     return SendMessage(message.chat.id, message.text)
+
     async def process(self, request, update: dict):
         telegram_update = types.Update(**update)
+        Bot.set_current(self.bot)
         await self.dispatcher.process_update(telegram_update)
 
     async def close(self):
