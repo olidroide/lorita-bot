@@ -165,13 +165,18 @@ async def whatsapp_receiver(request: Request, settings: Settings = Depends(get_s
 @router.post("/telegram")
 async def telegram_webhook(request: Request, update: dict):
     body = await request.body()
-    print(f'telegram/ body: {body} Request from:  {request.headers} - {request.client} - {request.client.host}')
+    print(f'telegram/ body: {body} Request from:  {request.headers} - {request.client} - {request.client.host} - update: {update}')
+
+    if request.app.state.telegram_bind:
+        await request.app.state.telegram_bind.process(request, update)
+
     return {"succes": True}
 
 @router.post("/telegram/{token}")
 async def telegram_webhook(request: Request, update: dict, token: Optional[str]):
     body = await request.body()
-    print(f'telegram/{token} body: {body} Request from:  {request.headers} - {request.client} - {request.client.host}')
+    print(f'telegram/{token} body: {body} Request from:  {request.headers} - {request.client} - {request.client.host} ')
+
 
     # telegram_update = types.Update(**update)
     # Dispatcher.set_current(dp)
