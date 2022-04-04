@@ -3,3 +3,4 @@ python-dotenv==0.20.0
 typing-extensions==4.1.1
 deepgram-sdk==0.2.3
 black==22.1.0
+pyTelegramBotAPI==4.4.0

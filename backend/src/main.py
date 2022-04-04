@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from api_router import router as api_router
 from app import get_settings
+from telegram import init_telegram
 
 
 def create_app():
@@ -25,7 +26,7 @@ def create_app():
 
     @app.on_event("startup")
     async def startup_event():
-        pass
+        app.state.telegram_bind = await init_telegram(config)
 
     @app.on_event("shutdown")
     async def shutdown_event():

@@ -12,6 +12,7 @@ services:
       - LORITA_BOT_BACKEND_TWILIO_ACCOUNT_SID=******
       - LORITA_BOT_BACKEND_TWILIO_AUTH_TOKEN=*****
       - LORITA_BOT_BACKEND_DG_KEY=*****
+      - LORITA_BOT_BACKEND_TELEGRAM_API_KEY=******
     ports:
       - 9999:9999
     healthcheck:

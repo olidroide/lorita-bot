@@ -138,6 +138,7 @@ Depends of how do you want deploy it:
 	 LORITA_BOT_TWILIO_ACCOUNT_SID=[Twilio Account SID]
 	 LORITA_BOT_TWILIO_AUTH_TOKEN=[Twilio Auth Token]
 	 LORITA_BOT_DG_KEY=[Deepgram API KEY]
+	 LORITA_BOT_BACKEND_TELEGRAM_API_KEY=[Telegram API key obtained by BotFather]
    ```
 	 
 - Deploy with Python 🐍
