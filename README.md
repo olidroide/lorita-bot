@@ -101,6 +101,7 @@ Lorita-Bot transcribe that Audio Message to text, and you cand read it without l
 * [Python](https://www.python.org/)
 * [Docker](https://www.docker.com/)
 * [PyCharm](https://www.jetbrains.com/pycharm/)
+* [Next.js](https://nextjs.org/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -139,6 +140,7 @@ Depends of how do you want deploy it:
 	 LORITA_BOT_TWILIO_AUTH_TOKEN=[Twilio Auth Token]
 	 LORITA_BOT_DG_KEY=[Deepgram API KEY]
 	 LORITA_BOT_BACKEND_TELEGRAM_API_KEY=[Telegram API key obtained by BotFather]
+     LORITA_BOT_BACKEND_DOMAIN_NAME=[your domain name example: lorita-bot.olidroide.es]
    ```
 	 
 - Deploy with Python 🐍

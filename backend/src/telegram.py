@@ -5,7 +5,6 @@ from typing import Optional
 from aiogram import Bot, Dispatcher, types, md
 from aiogram.dispatcher.handler import current_handler
 from aiogram.dispatcher.middlewares import BaseMiddleware
-from aiogram.dispatcher.webhook import SendMessage
 
 from app import Settings
 from domains.transcription.factory import get_deepgram_client
@@ -91,15 +90,18 @@ class LoritaTelegram:
 
             transcribed_text = message.text
             media_url = await message.voice.get_url() if message.voice else None
-            media_url = await message.audio.get_url() if message.audio and not media_url else None
+            media_url = await message.audio.get_url() if message.audio and not media_url else media_url
+            logger.debug(f"media URL -> {media_url}")
 
             if media_url:
                 async with get_deepgram_client(api_key=self.config.dg_key) as transcription_client:
                     transcribed_text = await transcription_client.audio_to_text(media_url=media_url)
 
             try:
-                print(f"method throught bot object")
-                await self.bot.send_message(message.chat.id, transcribed_text)
+                logger.debug(f"method through bot object")
+                if transcribed_text:
+                    await self.bot.send_message(message.chat.id, transcribed_text)
+
             except Exception as e:
                 print(f"{e}")
 
