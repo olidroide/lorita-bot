@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from typing import Optional, ClassVar
 
 from fastapi import APIRouter
@@ -9,6 +10,8 @@ from pydantic import BaseModel
 from app import get_settings, Settings
 from domains.transcription.factory import get_deepgram_client
 from domains.transcription.repository import TranscriptionClient
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -165,15 +168,15 @@ async def whatsapp_receiver(request: Request, settings: Settings = Depends(get_s
 @router.post("/telegram")
 async def telegram_webhook(request: Request, update: dict):
     body = await request.body()
-    print(
+    logger.debug(
         f"telegram body: {body} \n Request from:  {request.headers} - {request.client} - {request.client.host} \n update: {update}"
     )
 
     if request.app.state.telegram_bind:
         try:
-            await request.app.state.telegram_bind.process(request, update)
+            if (response := await request.app.state.telegram_bind.process(request, update)) is not None:
+                return response
         except Exception as e:
             print(f"error {e}")
 
     return {"succes": True}
-
