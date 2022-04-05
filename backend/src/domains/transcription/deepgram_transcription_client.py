@@ -40,6 +40,10 @@ class DeepgramTranscriptionClientCredentials(TranscriptionClientCredentials):
 
 class DeepgramTranscriptionClient(TranscriptionClient):
     async def audio_to_text(self, media_url: str) -> str:
+        if not media_url:
+            raise ValueError("required media_url")
+
+        print(f"transcribe this: {media_url}")
         client = Deepgram(self._credentials.api_key)
         source = {"url": media_url}
         options = {"punctuate": True, "interim_results": True, "language": "es"}

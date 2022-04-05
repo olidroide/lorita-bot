@@ -56,13 +56,21 @@ class LoritaTelegram:
         async def echo(message: types.Message):
             # Regular request
             # await bot.send_message(message.chat.id, message.text)
-            media_url = await message.audio.get_url()
-            transcribed_text = None
-            async with get_deepgram_client(api_key=self.config.dg_key) as transcription_client:
-                transcribed_text = await transcription_client.audio_to_text(media_url=media_url)
+            transcribed_text = message.text
+            media_url = await message.audio.get_url() if message.audio else None
 
-            # or reply INTO webhook
-            return SendMessage(message.chat.id, transcribed_text or message.text)
+            if media_url:
+                async with get_deepgram_client(api_key=self.config.dg_key) as transcription_client:
+                    transcribed_text = await transcription_client.audio_to_text(media_url=media_url)
+
+            try:
+                print(f"method throught bot object")
+                await self.bot.send_message(message.chat.id, transcribed_text)
+            except Exception as e:
+                print(f"{e}")
+
+            print(f"method response webhook bot object")
+            return SendMessage(message.chat.id, transcribed_text)
 
         self.dispatcher = dispatcher
 
