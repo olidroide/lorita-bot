@@ -1,17 +1,24 @@
 # from telebot.async_telebot import AsyncTeleBot
+import logging
 from typing import Optional, Callable, Awaitable, Any, Dict
 
 from aiogram import Bot, Dispatcher, types, md
+from aiogram.dispatcher.handler import current_handler
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher.webhook import SendMessage
 
 from app import Settings
 from domains.transcription.factory import get_deepgram_client
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+
 
 class CounterMiddleware(BaseMiddleware):
     def __init__(self) -> None:
         self.counter = 0
+        logger.debug(f"Middleware counter: {self.counter}")
         super(CounterMiddleware, self).__init__()
 
     async def __call__(
@@ -22,8 +29,18 @@ class CounterMiddleware(BaseMiddleware):
     ) -> Any:
         self.counter += 1
         data["counter"] = self.counter
-        print(f"Middleware counter: {data}")
+        logger.debug(f"Middleware via __call__ counter: {data}")
         return await handler(event, data)
+
+    async def on_process_message(self, message: types.Message, data: dict):
+        handler = current_handler.get()
+        dispatcher = Dispatcher.get_current()
+
+        self.counter += 1
+        data["counter"] = self.counter
+        logger.debug(f"Middleware via on_process_message counter: {data}")
+
+        # return await handler(event, data)
 
 
 class LoritaTelegram:
@@ -35,7 +52,6 @@ class LoritaTelegram:
         self.bot = bot
         self.config = config
         dispatcher = Dispatcher(bot)
-        dispatcher.setup_middleware(CounterMiddleware())
 
         @dispatcher.message_handler(commands="start")
         async def start(message: types.Message):
@@ -53,26 +69,30 @@ class LoritaTelegram:
             )
 
         @dispatcher.message_handler()
-        async def echo(message: types.Message):
+        async def echo(message: types.Message, counter: int):
             # Regular request
             # await bot.send_message(message.chat.id, message.text)
+
+            logger.debug(f"counter from middleware {counter}")
             transcribed_text = message.text
-            media_url = await message.audio.get_url() if message.audio else None
+            media_url = await message.voice.get_url() if message.audio else None
 
             if media_url:
                 async with get_deepgram_client(api_key=self.config.dg_key) as transcription_client:
                     transcribed_text = await transcription_client.audio_to_text(media_url=media_url)
 
-            try:
-                print(f"method throught bot object")
-                await self.bot.send_message(message.chat.id, transcribed_text)
-            except Exception as e:
-                print(f"{e}")
+            # try:
+            #     print(f"method throught bot object")
+            #     await self.bot.send_message(message.chat.id, transcribed_text)
+            # except Exception as e:
+            #     print(f"{e}")
 
-            print(f"method response webhook bot object")
+            logger.debug(f"method response webhook bot object")
             return SendMessage(message.chat.id, transcribed_text)
 
         self.dispatcher = dispatcher
+        # self.dispatcher.middleware.setup(CounterMiddleware())
+        self.dispatcher.setup_middleware(CounterMiddleware())
 
     async def process(self, request, update: dict):
         telegram_update = types.Update(**update)
