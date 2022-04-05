@@ -48,6 +48,15 @@
   height: 24px;
 }
 
+.telegram {
+  width: 24px;
+  height: 24px;
+}
+
+.telegram_button Button{
+  background: #0088cc;
+}
+
 .title a {
   color: #0070f3;
   text-decoration: none;

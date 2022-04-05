@@ -3,12 +3,16 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Button from '../components/Button'
 import WhatsApp from '../components/Icons/whastapp'
+import Telegram from '../components/Icons/telegram'
 import styles from '../styles/Home.module.css'
 
 export default function Home() {
-  const handleClick = () => {
-    console.log("click")
+  const handleWhatsappClick = () => {
     window.open("https://wa.me/14155238886?text=join%20government-number");
+  }
+
+  const handleTelegramClick = () => {
+    window.open("https://t.me/lorita_rita_bot");
   }
 
   return (
@@ -30,8 +34,15 @@ export default function Home() {
             Lorita Bot
           </h1>
           <h2 className={styles.subtitle}> Lorita helps you to transcript audio messages of your chat app</h2>
+          <div className={styles.telegram_button}>
+            <Button onClick={handleTelegramClick} >
+              <Telegram className={styles.telegram} />
+              Start with Telegram
+            </Button>
+          </div>
+
           <div>
-            <Button onClick={handleClick}>
+            <Button onClick={handleWhatsappClick}>
               <WhatsApp className={styles.whatsapp} />
               Start with WhatsApp
             </Button>

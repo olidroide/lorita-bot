@@ -177,6 +177,6 @@ async def telegram_webhook(request: Request, update: dict):
             if (response := await request.app.state.telegram_bind.process(request, update)) is not None:
                 return response
         except Exception as e:
-            print(f"error {e}")
+            logger.error(e)
 
     return {"succes": True}

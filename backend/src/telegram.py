@@ -87,8 +87,11 @@ class LoritaTelegram:
             # await bot.send_message(message.chat.id, message.text)
 
             logger.debug(f"counter from middleware {counter}")
+            logger.debug(f"message -> {message}")
+
             transcribed_text = message.text
-            media_url = await message.voice.get_url() if message.audio else None
+            media_url = await message.voice.get_url() if message.voice else None
+            media_url = await message.audio.get_url() if message.audio and not media_url else None
 
             if media_url:
                 async with get_deepgram_client(api_key=self.config.dg_key) as transcription_client:
@@ -100,8 +103,8 @@ class LoritaTelegram:
             except Exception as e:
                 print(f"{e}")
 
-            logger.debug(f"method response webhook bot object")
-            return SendMessage(message.chat.id, transcribed_text)
+            # logger.debug(f"method response webhook bot object")
+            # return SendMessage(message.chat.id, transcribed_text)
 
         self.dispatcher = dispatcher
         # self.dispatcher.middleware.setup(CounterMiddleware())
