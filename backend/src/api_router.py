@@ -175,3 +175,21 @@ async def telegram_webhook(request: Request, update: dict, background_tasks: Bac
         background_tasks.add_task(request.app.state.telegram_bind.process, update)
 
     return {"success": True}
+
+
+# class TranscribeRequest(BaseModel):
+#     audio_url: str
+#
+#
+# @router.post("/transcribe")
+# async def transcribe(data: TranscribeRequest, settings: Settings = Depends(get_settings)):
+#     print(f"got request in transcribe:{data.audio_url}")
+#     print(f"Settings: {settings}")
+#     print("sending recording to deepgram")
+#
+#     async with get_deepgram_client(api_key=settings.dg_key) as transcription_client:
+#         transcribed_text = await transcription_client.audio_to_text(data.audio_url)
+#
+#     print("done processing request, sending deepgram response back to client", transcribed_text)
+#
+#     return transcribed_text

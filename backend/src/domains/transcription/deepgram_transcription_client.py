@@ -51,7 +51,7 @@ class DeepgramTranscriptionClient(TranscriptionClient):
 
         client = Deepgram(self._credentials.api_key)
         source = {"url": media_url}
-        options = {"punctuate": True, "interim_results": True, "language": "es"}
+        options = {"punctuate": True, "language": "es"}
 
         try:
             deepgram_res = await client.transcription.prerecorded(source, options)
