@@ -1,9 +1,13 @@
+import logging
 from typing import Optional, List, Dict
 
 from deepgram import Deepgram
 from pydantic import BaseModel
 
 from domains.transcription.repository import TranscriptionClient, TranscriptionClientCredentials
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 class DeepgramAlternative(BaseModel):
@@ -43,12 +47,17 @@ class DeepgramTranscriptionClient(TranscriptionClient):
         if not media_url:
             raise ValueError("required media_url")
 
-        print(f"transcribe this: {media_url}")
+        logger.debug(f"credentials: {self._credentials} transcribe this: {media_url}")
+
         client = Deepgram(self._credentials.api_key)
         source = {"url": media_url}
         options = {"punctuate": True, "interim_results": True, "language": "es"}
 
-        deepgram_res = await client.transcription.prerecorded(source, options)
+        try:
+            deepgram_res = await client.transcription.prerecorded(source, options)
+        except Exception as e:
+            logger.error(e)
+            return ""
 
         print(f"Transcription complete!\n {deepgram_res}")
 
