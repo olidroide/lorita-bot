@@ -2,8 +2,7 @@ import asyncio
 import logging
 from typing import Optional, ClassVar
 
-from fastapi import APIRouter
-from fastapi import Depends, Request
+from fastapi import APIRouter, Depends, Request, BackgroundTasks
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
@@ -166,17 +165,13 @@ async def whatsapp_receiver(request: Request, settings: Settings = Depends(get_s
 
 
 @router.post("/telegram")
-async def telegram_webhook(request: Request, update: dict):
+async def telegram_webhook(request: Request, update: dict, background_tasks: BackgroundTasks):
     body = await request.body()
     logger.debug(
         f"telegram body: {body} \n Request from:  {request.headers} - {request.client} - {request.client.host} \n update: {update}"
     )
 
     if request.app.state.telegram_bind:
-        try:
-            if (response := await request.app.state.telegram_bind.process(request, update)) is not None:
-                return response
-        except Exception as e:
-            logger.error(e)
+        background_tasks.add_task(request.app.state.telegram_bind.process, update)
 
-    return {"succes": True}
+    return {"success": True}

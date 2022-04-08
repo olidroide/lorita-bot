@@ -1,4 +1,3 @@
-import asyncio
 import os
 
 import uvicorn
@@ -7,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from api_router import router as api_router
 from app import get_settings
-from telegram import init_telegram
+from domains.messaging.factory import get_telegram_client
 
 
 def create_app():
@@ -20,14 +19,14 @@ def create_app():
         debug=config.debug,
         docs_url="/docs/",
         openapi_url="/docs/openapi.json",
-        # servers=[{"url": config.baseurl}],
     )
 
     app.state.config = config
 
     @app.on_event("startup")
     async def startup_event():
-        app.state.telegram_bind = await init_telegram(config)
+        async with get_telegram_client() as telegram_client:
+            app.state.telegram_bind = telegram_client
 
     @app.on_event("shutdown")
     async def shutdown_event():

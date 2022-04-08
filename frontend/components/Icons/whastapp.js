@@ -1,6 +1,6 @@
 import * as React from "react"
 
-export default function WhatsApp(props){return(
+export function WhatsApp(props){return(
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 175.216 175.552"

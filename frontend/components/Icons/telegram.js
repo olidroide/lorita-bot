@@ -1,6 +1,6 @@
 import * as React from "react"
 
-export default function Telegram(props){return(
+export function Telegram(props){return(
   <svg
     data-name="Livello 1"
     xmlns="http://www.w3.org/2000/svg"

@@ -1,10 +1,9 @@
 import Head from 'next/head'
 import Image from 'next/image'
-import Link from 'next/link'
 import Button from '../components/Button'
-import WhatsApp from '../components/Icons/whastapp'
-import Telegram from '../components/Icons/telegram'
+import {Telegram, WhatsApp} from "../components/Icons"
 import styles from '../styles/Home.module.css'
+
 
 export default function Home() {
   const handleWhatsappClick = () => {
@@ -34,15 +33,16 @@ export default function Home() {
             Lorita Bot
           </h1>
           <h2 className={styles.subtitle}> Lorita helps you to transcript audio messages of your chat app</h2>
-          <div className={styles.telegram_button}>
-            <Button onClick={handleTelegramClick} >
+          
+          <div>
+            <Button onClick={handleTelegramClick} color={"telegram"} >
               <Telegram className={styles.telegram} />
               Start with Telegram
             </Button>
           </div>
 
           <div>
-            <Button onClick={handleWhatsappClick}>
+            <Button onClick={handleWhatsappClick}  color={'whatsapp'} >
               <WhatsApp className={styles.whatsapp} />
               Start with WhatsApp
             </Button>

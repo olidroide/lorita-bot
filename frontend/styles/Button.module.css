@@ -12,6 +12,14 @@
     align-items: center;
 }
 
+.telegram {
+    background: #0088cc;
+}
+
+.whatsapp {
+    background: green;
+}
+
 .button:hover {
     opacity: .7;
 }

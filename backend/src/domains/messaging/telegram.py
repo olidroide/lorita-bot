@@ -1,6 +1,4 @@
-# from telebot.async_telebot import AsyncTeleBot
 import logging
-from typing import Optional
 
 from aiogram import Bot, Dispatcher, types, md
 from aiogram.dispatcher.handler import current_handler
@@ -18,17 +16,6 @@ class CounterMiddleware(BaseMiddleware):
         self.counter = 0
         logger.debug(f"Middleware counter: {self.counter}")
         super(CounterMiddleware, self).__init__()
-
-    # async def __call__(
-    #     self,
-    #     handler: Callable[[types.Message, Dict[str, Any]], Awaitable[Any]],
-    #     event: types.Message,
-    #     data: Dict[str, Any],
-    # ) -> Any:
-    #     self.counter += 1
-    #     data["counter"] = self.counter
-    #     logger.debug(f"Middleware via __call__ counter: {data}")
-    #     return await handler(event, data)
 
     async def on_process_message(self, message: types.Message, data: dict):
         handler = current_handler.get()
@@ -55,15 +42,26 @@ class CounterMiddleware(BaseMiddleware):
         logger.debug(f"Middleware via on_process_voice_message counter: {data}")
 
 
-class LoritaTelegram:
+class LoritaTelegram(object):
     bot: Bot
     dispatcher: Dispatcher
+
+    @classmethod
+    async def create(cls, api_key: str, config: Settings):
+        bot = Bot(token=api_key, validate_token=not config.testing)
+        if not config.testing:
+            WEBHOOK_URL = f"https://{config.domain_name}{config.baseurl}/telegram"
+            webhook_info = await bot.get_webhook_info()
+            if webhook_info.url != WEBHOOK_URL:
+                await bot.set_webhook(url=WEBHOOK_URL)
+
+        return LoritaTelegram(bot=bot, config=config)
 
     def __init__(self, bot: Bot, config: Settings) -> None:
         super().__init__()
         self.bot = bot
         self.config = config
-        dispatcher = Dispatcher(bot)
+        dispatcher = Dispatcher(self.bot)
 
         @dispatcher.message_handler(commands="start")
         async def start(message: types.Message):
@@ -98,41 +96,25 @@ class LoritaTelegram:
                     transcribed_text = await transcription_client.audio_to_text(media_url=media_url)
 
             try:
-                logger.debug(f"method through bot object")
                 if transcribed_text:
                     await self.bot.send_message(message.chat.id, transcribed_text)
-
             except Exception as e:
                 print(f"{e}")
 
-            # logger.debug(f"method response webhook bot object")
-            # return SendMessage(message.chat.id, transcribed_text)
-
         self.dispatcher = dispatcher
-        # self.dispatcher.middleware.setup(CounterMiddleware())
         self.dispatcher.setup_middleware(CounterMiddleware())
 
-    async def process(self, request, update: dict):
+    async def process(self, update: dict):
         telegram_update = types.Update(**update)
         Bot.set_current(self.bot)
         return await self.dispatcher.process_update(telegram_update)
 
     async def close(self):
+        if self.config.testing:
+            return
+
+        Bot.set_current(self.bot)
         await self.bot.delete_webhook(True)
         await self.bot.close()
         await self.dispatcher.storage.close()
         await self.dispatcher.storage.wait_closed()
-
-
-async def init_telegram(config: Settings) -> Optional[LoritaTelegram]:
-    if not config.domain_name or not config.telegram_api_key or config.testing:
-        return None
-
-    bot = Bot(token=config.telegram_api_key)
-
-    WEBHOOK_URL = f"https://{config.domain_name}{config.baseurl}/telegram"
-    webhook_info = await bot.get_webhook_info()
-    if webhook_info.url != WEBHOOK_URL:
-        await bot.set_webhook(url=WEBHOOK_URL)
-
-    return LoritaTelegram(bot=bot, config=config)

@@ -1,0 +1,92 @@
+version: '2.3'
+
+services:
+  traefik:
+    image: traefik:2.6.1
+    container_name: traefik
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - world
+      - internal-lan
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  lorita-bot:
+    image: ghcr.io/olidroide/lorita-bot:backend-latest
+    container_name: lorita-bot
+    restart: unless-stopped
+    depends_on:
+      - traefik
+    networks:
+      - internal-lan
+      - world
+    ports:
+      - 8000:8000
+    environment:
+      - LORITA_BOT_BACKEND_PORT=8000
+      - LORITA_BOT_BACKEND_DEBUG=True
+      - LORITA_BOT_BACKEND_BASEURL=/api/v1
+      - LORITA_BOT_BACKEND_LOG_LEVEL=DEBUG
+      - LORITA_BOT_BACKEND_DOMAIN_NAME=lorita-bot.olidroide.es
+      - LORITA_BOT_BACKEND_DG_KEY=********
+      - LORITA_BOT_BACKEND_TELEGRAM_API_KEY=0000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=internal-lan
+      # HTTP
+      - traefik.http.routers.lorita-bot.rule=Host(`lorita-bot.olidroide.es`) && PathPrefix(`/api/v1`)
+      - traefik.http.services.lorita-bot.loadbalancer.server.port=8000
+      - traefik.http.routers.lorita-bot.entrypoints=web
+      # REDIRECT
+      - traefik.http.routers.lorita-bot.middlewares=lorita-bot-https-redirect
+      - traefik.http.middlewares.lorita-bot-https-redirect.redirectscheme.scheme=https
+      # HTTPS
+      - traefik.http.routers.lorita-bot-secure.rule=Host(`lorita-bot.olidroide.es`) && PathPrefix(`/api/v1`)
+      - traefik.http.routers.lorita-bot-secure.entrypoints=websecure
+      - traefik.http.routers.lorita-bot-secure.tls.certresolver=letsencrypt
+
+  lorita-bot-frontend:
+    image: ghcr.io/olidroide/lorita-bot:frontend-latest
+    container_name: lorita-bot-frontend
+    restart: unless-stopped
+    depends_on:
+      - traefik
+    networks:
+      - internal-lan
+    ports:
+      - 3000:3000
+    environment:
+      - LORITA_BOT_BACKEND_PORT=8000
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=internal-lan
+      # HTTP
+      - traefik.http.routers.lorita-bot-frontend.rule=Host(`lorita-bot.olidroide.es`)
+      - traefik.http.services.lorita-bot-frontend.loadbalancer.server.port=3000
+      - traefik.http.routers.lorita-bot-frontend.entrypoints=web
+      # REDIRECT
+      - traefik.http.routers.lorita-bot-frontend.middlewares=lorita-bot-https-redirect
+      # HTTPS
+      - traefik.http.routers.lorita-bot-frontend-secure.rule=Host(`lorita-bot.olidroide.es`)
+      - traefik.http.routers.lorita-bot-frontend-secure.entrypoints=websecure
+      - traefik.http.routers.lorita-bot-frontend-secure.tls.certresolver=letsencrypt
+
+networks:
+  world:
+    name: world
+    external: true
+  internal-lan:
+    name: internal-lan
+    external: false
+    internal: true
