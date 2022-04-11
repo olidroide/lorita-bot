@@ -289,8 +289,8 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 - [x] Dockerized image
 - [ ] Multilanguage detection
-- [ ] More Chat app integrations
-  - [ ] Telegram
+- [x] More Chat app integrations
+  - [x] Telegram
 
 See the [open issues](https://github.com/olidroide/lorita-bot/issues) for a full list of proposed features (and known issues).
 
@@ -333,16 +333,6 @@ Project Link: [https://github.com/olidroide/lorita-bot](https://github.com/olidr
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-<!-- ACKNOWLEDGMENTS -->
-
-## Acknowledgments
-
-- []()
-- []()
-- []()
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 <!--
 ## 🍰 **Supporters and donators**
 
@@ -380,7 +370,7 @@ By donating, you will help the development of this project, and *you will be fea
 [issues-shield]: https://img.shields.io/github/issues/olidroide/lorita-bot.svg?style=for-the-badge
 [issues-url]: https://github.com/olidroide/lorita-bot/issues
 [license-shield]: https://img.shields.io/github/license/olidroide/lorita-bot.svg?style=for-the-badge
-[license-url]: https://github.com/olidroide/lorita-bot/blob/master/LICENSE.txt
+[license-url]: https://github.com/olidroide/lorita-bot/blob/main/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/olidroide
 [product-screenshot]: images/screenshot.png
