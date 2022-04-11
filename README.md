@@ -20,7 +20,7 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
+[![Apache License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 <!-- PROJECT LOGO -->
@@ -317,7 +317,7 @@ Don't forget to give the project a star! Thanks again!
 
 ## ✍️ License
 
-Distributed under the GNU General Public License v2.0. See `LICENSE` for more information.
+Distributed under the Apache License. See `LICENSE` for more information.
 
 Lorita-bot logo parrot designs were created by Freepik - Flaticon [Freepik - Flaticon](https://www.flaticon.com/free-icons/parrot)
 
